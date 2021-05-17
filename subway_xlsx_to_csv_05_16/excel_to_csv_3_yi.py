@@ -6,7 +6,7 @@ import pandas as pd
 
 
 # 경로 파일 체크하기
-start_path = 'C:/Users/COM/Desktop/bplace/statics_prj/subway/yongin'
+start_path = 'C:/Users/bplace/Desktop/project/kostats/subway/yi'
 # 파일 리스트
 file_list = os.listdir(start_path)
 print("file_list = ", file_list)
@@ -46,7 +46,7 @@ for file_name in file_list:
             'region' : file_name.replace('.xlsx',''),
             'station_nm' : subway['Unnamed: 0'],
             'surv_dt' : pd.to_datetime(subway['Unnamed: 1']),
-            'week_dt' : subway['Unnamed: 2'],
+            'week_dt' : subway['Unnamed: 2']+'요일',
             'inout_type' : sheet_name_list.replace('현황',''),
             'hour_4_psn_cnt': subway['03시~04시'],
             'hour_5_psn_cnt': subway['04시~05시'],
@@ -75,10 +75,12 @@ for file_name in file_list:
         # 승/하차 현황 합치기
         df = df.append(subway_frame)
 
+        # 승/하차 value 변경하기기
+        df.loc[(df.inout_type == '승차'), 'inout_type'] = '1.승차'
+        df.loc[(df.inout_type == '하차'), 'inout_type'] = '2.하차'
+
+        print(df[['region', 'station_nm', 'surv_dt', 'week_dt', 'inout_type']])
+
         # csv 파일 형태로 저장하기
-        df.to_csv(f'C:/Users/COM/Desktop/bplace/statics_prj/csv_file/{file_name.replace(".xlsx","")}.csv', sep=',', encoding='utf8')
-
-
-haha = pd.read_csv('C:/Users/COM/Desktop/bplace/statics_prj/csv_file/youngin.csv', encoding='utf8')
-print(haha[['region','station_nm','surv_dt']])
+        df.to_csv(f'C:/Users/bplace/Desktop/project/kostats/csv/{file_name.replace(".xlsx","")}.csv', sep=',', encoding='utf8', index=False)
 

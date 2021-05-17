@@ -6,7 +6,7 @@ import pandas as pd
 
 
 # 경로 파일 체크하기
-start_path = 'C:/Users/COM/Desktop/bplace/statics_prj/subway/daejeon'
+start_path = 'C:/Users/bplace/Desktop/project/kostats/subway/dj'
 # 파일 리스트
 file_list = os.listdir(start_path)
 print("file_list = ", file_list)
@@ -33,40 +33,72 @@ df = pd.DataFrame(columns=['region','station_nm','surv_dt','week_dt','inout_type
 for file_name in file_list:
     # 파일저장 경로 설정
     file_path = start_path + '/' + file_name
+
     # sheet name 을 기반으로 dataframe 출력
     for sheet_name_list in sheet_name_lists:
         subway = pd.read_excel(file_path, header=2, sheet_name=sheet_name_list)
         print('현황 = ', sheet_name_list)
         print(subway.head())
 
-        # 데이터 프레임 만들기
-        subway_frame = pd.DataFrame({
-            'region' : file_name.replace('.xlsx',''),
-            'station_nm' : subway['Unnamed: 0'],
-            'surv_dt' : pd.to_datetime(subway['Unnamed: 1']),
-            'week_dt' : subway['Unnamed: 2'],
-            'inout_type' : sheet_name_list.replace('현황',''),
-            'hour_6_psn_cnt' : subway['6시'],
-            'hour_7_psn_cnt' : subway['7시'],
-            'hour_8_psn_cnt' : subway['8시'],
-            'hour_9_psn_cnt' : subway['9시'],
-            'hour_10_psn_cnt' : subway['10시'],
-            'hour_11_psn_cnt' : subway['11시'],
-            'hour_12_psn_cnt' : subway['12시'],
-            'hour_13_psn_cnt' : subway['13시'],
-            'hour_14_psn_cnt' : subway['14시'],
-            'hour_15_psn_cnt' : subway['15시'],
-            'hour_16_psn_cnt' : subway['16시'],
-            'hour_17_psn_cnt' : subway['17시'],
-            'hour_18_psn_cnt' : subway['18시'],
-            'hour_19_psn_cnt' : subway['19시'],
-            'hour_20_psn_cnt' : subway['20시'],
-            'hour_21_psn_cnt' : subway['21시'],
-            'hour_22_psn_cnt' : subway['22시'],
-            'hour_23_psn_cnt' : subway['23시'],
-            'hour_24_psn_cnt' : subway['24시']
+        if sheet_name_list == '승차현황':
+            # 데이터 프레임 만들기
+            subway_frame = pd.DataFrame({
+                'region' : file_name.replace('.xlsx',''),
+                'station_nm' : subway['Unnamed: 0'],
+                'surv_dt' : pd.to_datetime(subway['Unnamed: 1']),
+                'week_dt' : subway['Unnamed: 2']+'요일',
+                'inout_type' : '1.'+sheet_name_list.replace('현황',''),
+                'hour_6_psn_cnt' : subway['6시'],
+                'hour_7_psn_cnt' : subway['7시'],
+                'hour_8_psn_cnt' : subway['8시'],
+                'hour_9_psn_cnt' : subway['9시'],
+                'hour_10_psn_cnt' : subway['10시'],
+                'hour_11_psn_cnt' : subway['11시'],
+                'hour_12_psn_cnt' : subway['12시'],
+                'hour_13_psn_cnt' : subway['13시'],
+                'hour_14_psn_cnt' : subway['14시'],
+                'hour_15_psn_cnt' : subway['15시'],
+                'hour_16_psn_cnt' : subway['16시'],
+                'hour_17_psn_cnt' : subway['17시'],
+                'hour_18_psn_cnt' : subway['18시'],
+                'hour_19_psn_cnt' : subway['19시'],
+                'hour_20_psn_cnt' : subway['20시'],
+                'hour_21_psn_cnt' : subway['21시'],
+                'hour_22_psn_cnt' : subway['22시'],
+                'hour_23_psn_cnt' : subway['23시'],
+                'hour_24_psn_cnt' : subway['24시']
+                })
+
+        if sheet_name_list == '하차현황':
+            # 데이터 프레임 만들기
+            subway_frame = pd.DataFrame({
+                'region': file_name.replace('.xlsx', ''),
+                'station_nm': subway['Unnamed: 0'],
+                'surv_dt': pd.to_datetime(subway['Unnamed: 1']),
+                'week_dt': subway['Unnamed: 2'] + '요일',
+                'inout_type': '2.' + sheet_name_list.replace('현황', ''),
+                'hour_6_psn_cnt': subway['6시'],
+                'hour_7_psn_cnt': subway['7시'],
+                'hour_8_psn_cnt': subway['8시'],
+                'hour_9_psn_cnt': subway['9시'],
+                'hour_10_psn_cnt': subway['10시'],
+                'hour_11_psn_cnt': subway['11시'],
+                'hour_12_psn_cnt': subway['12시'],
+                'hour_13_psn_cnt': subway['13시'],
+                'hour_14_psn_cnt': subway['14시'],
+                'hour_15_psn_cnt': subway['15시'],
+                'hour_16_psn_cnt': subway['16시'],
+                'hour_17_psn_cnt': subway['17시'],
+                'hour_18_psn_cnt': subway['18시'],
+                'hour_19_psn_cnt': subway['19시'],
+                'hour_20_psn_cnt': subway['20시'],
+                'hour_21_psn_cnt': subway['21시'],
+                'hour_22_psn_cnt': subway['22시'],
+                'hour_23_psn_cnt': subway['23시'],
+                'hour_24_psn_cnt': subway['24시']
             })
-        print(subway_frame)
+
+        print(subway_frame[['region','station_nm','surv_dt','week_dt','inout_type']])
 
         if subway_frame.loc[len(subway.index)-1, 'station_nm'] == '합계':
             subway_frame = subway_frame[0:len(subway.index) - 1]
@@ -75,6 +107,5 @@ for file_name in file_list:
             df = df.append(subway_frame)
 
         # csv 파일 형태로 저장하기
-        df.to_csv(f'C:/Users/COM/Desktop/bplace/statics_prj/csv_file/{file_name.replace(".xlsx","")}.csv', sep=',',encoding='utf8', index=False)
-
+        df.to_csv(f'C:/Users/bplace/Desktop/project/kostats/csv/{file_name.replace(".xlsx","")}.csv', sep=',',encoding='utf8', index=False)
 

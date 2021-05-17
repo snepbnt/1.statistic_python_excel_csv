@@ -5,7 +5,7 @@ import pandas as pd
 
 
 # 경로 파일 체크하기
-start_path = 'C:/Users/COM/Desktop/bplace/statics_prj/subway/busan'
+start_path = 'C:/Users/bplace/Desktop/project/kostats/subway/bs'
 # 파일 리스트
 file_list = os.listdir(start_path)
 print("file_list = ", file_list)
@@ -21,20 +21,20 @@ sheet_name_lists = sheet_name.sheet_names
 print("시트 이름 리스트 = ", sheet_name_lists)
 print("시트 개수 = ", len(sheet_name_lists))
 
-
 # 엑셀 불러오기
 for file_name in file_list:
     # 파일저장 경로 설정
     file_path = start_path + '/' + file_name
-    # sheet name 을 기반으로 dataframe 출력
 
+    # sheet name 을 기반으로 dataframe 출력
     subway = pd.read_excel(file_path)
+
     # 데이터 프레임 만들기
     subway_frame = pd.DataFrame({
         'region': file_name.replace('.xlsx', ''),
         'station_nm': subway['역명'],
         'surv_dt': pd.to_datetime(subway['날짜'].apply(str)),
-        'week_dt': subway['요일'],
+        'week_dt': subway['요일']+'요일',
         'inout_type': subway['승하차'],
         'hour_1_psn_cnt': subway['00-01'],
         'hour_2_psn_cnt': subway['01-02'],
@@ -61,10 +61,15 @@ for file_name in file_list:
         'hour_23_psn_cnt': subway['22-23'],
         'hour_24_psn_cnt': subway['23-24']
     })
-    print(subway_frame)
+
+    # 승/하차 value 변경하기기
+    subway_frame.loc[(subway_frame.inout_type == '승차'), 'inout_type'] = '1.승차'
+    subway_frame.loc[(subway_frame.inout_type == '하차'), 'inout_type'] = '2.하차'
+
+    print(subway_frame[['region','station_nm','surv_dt','week_dt','inout_type']])
 
     # csv 파일 형태로 저장하기
-    subway_frame.to_csv(f'C:/Users/COM/Desktop/bplace/statics_prj/csv_file/{file_name.replace(".xlsx", "")}.csv', sep=',',encoding='utf8', index=False)
+    subway_frame.to_csv(f'C:/Users/bplace/Desktop/project/kostats/csv/{file_name.replace(".xlsx", "")}.csv', sep=',',encoding='utf8', index=False)
 
 
 

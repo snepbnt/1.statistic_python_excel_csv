@@ -5,7 +5,7 @@ import pandas as pd
 
 
 # 경로 파일 체크하기
-start_path = 'C:/Users/COM/Desktop/bplace/statics_prj/subway/incheon'
+start_path = 'C:/Users/bplace/Desktop/project/kostats/subway/in'
 # 파일 리스트
 file_list = os.listdir(start_path)
 print("file_list = ", file_list)
@@ -27,12 +27,8 @@ df_1 = pd.DataFrame(columns=['region','station_nm','surv_dt','week_dt','inout_ty
                            'hour_12_psn_cnt','hour_13_psn_cnt','hour_14_psn_cnt','hour_15_psn_cnt','hour_16_psn_cnt','hour_17_psn_cnt','hour_18_psn_cnt','hour_19_psn_cnt','hour_20_psn_cnt',
                            'hour_21_psn_cnt','hour_22_psn_cnt','hour_23_psn_cnt','hour_24_psn_cnt'])
 
-df_2 = pd.DataFrame(columns=['region','station_nm','surv_dt','week_dt','inout_type','hour_4_psn_cnt','hour_5_psn_cnt','hour_6_psn_cnt','hour_7_psn_cnt','hour_8_psn_cnt','hour_9_psn_cnt','hour_10_psn_cnt','hour_11_psn_cnt',
-                           'hour_12_psn_cnt','hour_13_psn_cnt','hour_14_psn_cnt','hour_15_psn_cnt','hour_16_psn_cnt','hour_17_psn_cnt','hour_18_psn_cnt','hour_19_psn_cnt','hour_20_psn_cnt',
-                           'hour_21_psn_cnt','hour_22_psn_cnt','hour_23_psn_cnt','hour_24_psn_cnt'])
 
-# 엑셀 불러오기 len(subway.index)-1
-
+# 엑셀 불러오기
 for file_name in file_list:
     # 파일저장 경로 설정
     file_path = start_path + '/' + file_name
@@ -49,7 +45,7 @@ for file_name in file_list:
                 'region' : file_name.replace('.xlsx',''),
                 'station_nm' : subway['Unnamed: 0'],
                 'surv_dt' : pd.to_datetime(subway['Unnamed: 1'].apply(str)),
-                'week_dt' : subway['Unnamed: 2'],
+                'week_dt' : subway['Unnamed: 2']+'요일',
                 'inout_type' : sheet_name.replace('현황(1호선)',''),
                 'hour_4_psn_cnt': subway['04시'],
                 'hour_5_psn_cnt': subway['05시'],
@@ -82,8 +78,8 @@ for file_name in file_list:
             else:
                 df_1 = df_1.append(subway_frame)
 
-            # csv 파일 형태로 저장하기
-            df_1.to_csv(f'C:/Users/COM/Desktop/bplace/statics_prj/csv_file/{file_name.replace(".xlsx","")}_1st.csv', sep=',',encoding='utf8', index=False)
+            # # csv 파일 형태로 저장하기
+            # df_1.to_csv(f'C:/Users/bplace/Desktop/project/kostats/csv/{file_name.replace(".xlsx","")}_1st.csv', sep=',',encoding='utf8', index=False)
 
         # 2호선 조건 분기
         if '2호선' in sheet_name:
@@ -92,7 +88,7 @@ for file_name in file_list:
                 'region': file_name.replace('.xlsx', ''),
                 'station_nm': subway['Unnamed: 0'],
                 'surv_dt': subway['Unnamed: 1'],
-                'week_dt': subway['Unnamed: 2'],
+                'week_dt': subway['Unnamed: 2']+'요일',
                 'inout_type': sheet_name.replace('현황(2호선)', ''),
                 'hour_4_psn_cnt': subway['04시'],
                 'hour_5_psn_cnt': subway['05시'],
@@ -122,8 +118,14 @@ for file_name in file_list:
             idx_drop = subway_frame[subway_frame['surv_dt'] == '역계'].index
             subway_frame_fin = subway_frame.drop(idx_drop)
             subway_frame_fin['surv_dt'] = pd.to_datetime(subway_frame_fin['surv_dt'])
-            df_2  = df_2 .append(subway_frame_fin)
+            df_1  = df_1 .append(subway_frame_fin)
+
+            # 승/하차 value 변경하기기
+            df_1.loc[(df_1.inout_type == '승차'), 'inout_type'] = '1.승차'
+            df_1.loc[(df_1.inout_type == '하차'), 'inout_type'] = '2.하차'
+
+            print(df_1[['region', 'station_nm', 'surv_dt', 'week_dt', 'inout_type']])
 
             # csv 파일 형태로 저장하기
-            df_2 .to_csv(f'C:/Users/COM/Desktop/bplace/statics_prj/csv_file/{file_name.replace(".xlsx", "")}_2nd.csv', sep=',',encoding='utf8', index=False)
+            df_1.to_csv(f'C:/Users/bplace/Desktop/project/kostats/csv/{file_name.replace(".xlsx", "")}.csv', sep=',',encoding='utf8', index=False)
 

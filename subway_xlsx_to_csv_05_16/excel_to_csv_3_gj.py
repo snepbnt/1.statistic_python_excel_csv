@@ -5,7 +5,7 @@ import pandas as pd
 
 
 # 경로 파일 체크하기
-start_path = 'C:/Users/COM/Desktop/bplace/statics_prj/subway/gwangju'
+start_path = 'C:/Users/bplace/Desktop/project/kostats/subway/gj'
 # 파일 리스트
 file_list = os.listdir(start_path)
 print("file_list = ", file_list)
@@ -36,15 +36,13 @@ for file_name in file_list:
     for sheet_name_list in sheet_name_lists:
         subway = pd.read_excel(file_path, header=2, sheet_name=sheet_name_list)
         print('현황 = ', sheet_name_list)
-        print(subway.info())
-        print(subway.head())
 
         # 데이터 프레임 만들기
         subway_frame = pd.DataFrame({
             'region' : file_name.replace('.xlsx',''),
             'station_nm' : subway['Unnamed: 0'],
             'surv_dt' : pd.to_datetime(subway['Unnamed: 1'].apply(str)),
-            'week_dt' : subway['Unnamed: 2'],
+            'week_dt' : subway['Unnamed: 2']+'요일',
             'inout_type' : sheet_name_list.replace('현황',''),
             'hour_5_psn_cnt': subway['5시'],
             'hour_6_psn_cnt' : subway['6시'],
@@ -67,7 +65,12 @@ for file_name in file_list:
             'hour_23_psn_cnt' : subway['23시'],
             'hour_24_psn_cnt' : subway['24시']
             })
-        print(subway_frame)
+
+        # 승/하차 value 변경하기기
+        subway_frame.loc[(subway_frame.inout_type == '승차'), 'inout_type'] = '1.승차'
+        subway_frame.loc[(subway_frame.inout_type == '하차'), 'inout_type'] = '2.하차'
+
+        print(subway_frame[['region','station_nm','surv_dt','week_dt','inout_type']])
 
         if subway_frame.loc[len(subway.index)-1, 'station_nm'] == '합계':
             subway_frame = subway_frame[0:len(subway.index) - 1]
@@ -76,4 +79,4 @@ for file_name in file_list:
             df = df.append(subway_frame)
 
         # csv 파일 형태로 저장하기
-        df.to_csv(f'C:/Users/COM/Desktop/bplace/statics_prj/csv_file/{file_name.replace(".xlsx","")}.csv', sep=',' ,encoding='utf8', index=False)
+        df.to_csv(f'C:/Users/bplace/Desktop/project/kostats/csv/{file_name.replace(".xlsx","")}.csv', sep=',' ,encoding='utf8', index=False)
